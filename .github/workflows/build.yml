@@ -10,19 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Build with Buildozer
-      uses: artem-solovev/buildozer-action@v2
+      uses: artem-solovev/buildozer-action@v2.0.1
       with:
         buildozer-version: stable
         work-dir: ./
         buildozer-cmd: buildozer android debug
         
     - name: Upload APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: AppListGenerator-APK
         path: bin/*.apk
         retention-days: 30
-        
