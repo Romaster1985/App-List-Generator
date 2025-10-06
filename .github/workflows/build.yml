@@ -12,12 +12,20 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Build with Buildozer
-      uses: artem-solovev/buildozer-action@v2.0.1
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        buildozer-version: stable
-        work-dir: ./
-        buildozer-cmd: buildozer android debug
+        python-version: '3.9'
+    
+    - name: Install Buildozer and dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git autoconf automake autotools-dev curl python3-pip python3-venv
+        pip3 install --upgrade buildozer cython virtualenv
+        
+    - name: Build APK with Buildozer
+      run: |
+        buildozer android debug
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
