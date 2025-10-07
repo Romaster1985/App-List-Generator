@@ -12,28 +12,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    
-    - name: Install Buildozer and dependencies
+    - name: Build using Docker
       run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          python3-pip \
-          autoconf \
-          automake \
-          build-essential \
-          openjdk-11-jdk \
-          unzip \
-          zlib1g-dev
-        pip3 install --user buildozer cython virtualenv
-        
-    - name: Build APK
-      run: |
-        export PATH=$PATH:~/.local/bin
-        buildozer android debug
+        docker run --rm \
+        -v $(pwd):/home/user/hostcwd \
+        -v buildozer_deps:/home/user/.buildozer \
+        -v android_sdk:/home/user/.android \
+        cirocosta/buildozer buildozer android debug
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
