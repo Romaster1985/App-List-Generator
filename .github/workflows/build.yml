@@ -12,76 +12,24 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    
-    - name: Install system dependencies
+    - name: Setup environment
       run: |
         sudo apt-get update
-        sudo apt-get install -y \
-          python3-pip \
-          build-essential \
-          openjdk-11-jdk \
-          unzip \
-          zlib1g-dev \
-          libffi-dev \
-          libssl-dev \
-          autoconf \
-          automake \
-          libtool \
-          pkg-config \
-          cmake \
-          git \
-          ccache \
-          gettext \
-          curl \
-          wget \
-          zip \
-          unzip
-          
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install buildozer cython virtualenv wheel
+        sudo apt-get install -y python3-pip openjdk-11-jdk git zip unzip
         
-    - name: Accept ALL Android SDK licenses
+    - name: Install buildozer
+      run: pip install buildozer cython
+        
+    - name: Accept Android licenses
       run: |
         mkdir -p $ANDROID_SDK_ROOT/licenses
         echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_SDK_ROOT/licenses/android-sdk-license
         echo "84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_SDK_ROOT/licenses/android-sdk-preview-license
-        echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > $ANDROID_SDK_ROOT/licenses/android-sdk-license
-        echo "601085b94cd77f0b54ff86406957099ebe79c4d6" > $ANDROID_SDK_ROOT/licenses/android-googletv-license
-        echo "33b6a2b64607f11b759f320ef9dff4ae5c47d97a" > $ANDROID_SDK_ROOT/licenses/google-gdk-license
-        echo "0854b892cf1d2c8b44e4d1d64b1fb090e8e94d2b" > $ANDROID_SDK_ROOT/licenses/intel-android-extra-license
         
-    - name: Install specific Android build tools
-      run: |
-        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.0" "platforms;android-33" "platform-tools" "cmdline-tools;latest" --sdk_root=$ANDROID_SDK_ROOT
-        
-    - name: Initialize Buildozer environment
+    - name: Build APK directly
       run: |
         export PATH=$PATH:~/.local/bin
-        export ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT
-        export ANDROID_NDK_HOME=$ANDROID_NDK_ROOT
-        
-        # Inicializar Buildozer si no existe
-        if [ ! -d ".buildozer" ]; then
-          buildozer init
-        fi
-        
-        # Actualizar todas las dependencias primero
-        buildozer android update || true
-        
-    - name: Build APK
-      run: |
-        export PATH=$PATH:~/.local/bin
-        export ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT
-        export ANDROID_NDK_HOME=$ANDROID_NDK_ROOT
-        
-        # Compilar directamente sin clean para evitar el error
-        buildozer -v android debug
+        buildozer android debug
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
