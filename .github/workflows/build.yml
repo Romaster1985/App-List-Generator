@@ -28,7 +28,7 @@ jobs:
           openjdk-11-jdk \
           unzip \
           zlib1g-dev
-        pip3 install --user buildozer
+        pip3 install --user buildozer cython virtualenv
         
     - name: Build APK
       run: |
