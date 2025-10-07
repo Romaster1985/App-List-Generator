@@ -12,19 +12,33 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
     
-    - name: Install Buildozer and dependencies
+    - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git autoconf automake autotools-dev curl python3-pip python3-venv
-        pip3 install --upgrade buildozer cython virtualenv
+        sudo apt-get install -y \
+          python3-pip \
+          autoconf \
+          automake \
+          build-essential \
+          ccache \
+          libffi-dev \
+          libltdl-dev \
+          libssl-dev \
+          openjdk-11-jdk \
+          unzip \
+          zlib1g-dev
         
-    - name: Build APK with Buildozer
+    - name: Install Buildozer
+      run: pip3 install --user buildozer
+      
+    - name: Build APK
       run: |
+        export PATH=$PATH:~/.local/bin
         buildozer android debug
         
     - name: Upload APK
