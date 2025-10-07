@@ -12,31 +12,17 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Build with Buildozer in isolated environment
+    - name: Setup environment
       run: |
-        # Create a simple Dockerfile and build
-        cat > Dockerfile << EOF
-        FROM ubuntu:22.04
+        sudo apt-get update
+        sudo apt-get install -y python3-pip python3-venv openjdk-11-jdk git zip unzip
         
-        RUN apt-get update && apt-get install -y \
-            python3-pip \
-            build-essential \
-            openjdk-11-jdk \
-            git \
-            zip \
-            unzip \
-            zlib1g-dev
-            
-        RUN pip3 install buildozer cython
-        
-        WORKDIR /app
-        COPY . .
-        
-        RUN buildozer android debug
-        EOF
-        
-        docker build -t app-builder .
-        docker run --rm -v $(pwd)/bin:/app/bin app-builder
+    - name: Create virtual environment and install buildozer
+      run: |
+        python3 -m venv buildozer-env
+        source buildozer-env/bin/activate
+        pip install buildozer cython
+        buildozer android debug
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
