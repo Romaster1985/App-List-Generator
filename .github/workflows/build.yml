@@ -33,17 +33,17 @@ jobs:
         echo "84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_SDK_ROOT/licenses/android-sdk-preview-license
         
         # Usar expect para aceptar interactivamente las licencias restantes
-        expect -c "
+        expect -c '
 set timeout 30
-spawn $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
+spawn $env(ANDROID_SDK_ROOT)/cmdline-tools/latest/bin/sdkmanager --licenses
 expect {
-  \"Accept? (y/N):\" { 
-    send \"y\r\"
+  "Accept? (y/N):" { 
+    send "y\r"
     exp_continue 
   }
   eof
 }
-"
+'
         
     - name: Install Android build tools
       run: |
