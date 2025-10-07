@@ -20,15 +20,26 @@ jobs:
     - name: Install buildozer
       run: pip install buildozer cython
         
-    - name: Install Android tools with specific version
+    - name: Install Android SDK tools
       run: |
-        # Método directo: instalar una versión OLDER de build-tools que no pida licencia
-        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;30.0.3" "platforms;android-33" "platform-tools"
+        # Aceptar licencias de manera agresiva
+        mkdir -p $ANDROID_SDK_ROOT/licenses
+        echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_SDK_ROOT/licenses/android-sdk-license
+        echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> $ANDROID_SDK_ROOT/licenses/android-sdk-license
+        echo "84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_SDK_ROOT/licenses/android-sdk-preview-license
         
-    - name: Build APK
+        # Instalar platform-tools y platforms primero
+        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33"
+        
+        # Instalar build-tools 33.0.0 específicamente
+        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.0"
+        
+    - name: Build APK with specific build tools
       run: |
         export PATH=$PATH:~/.local/bin
-        buildozer android debug
+        
+        # Forzar a buildozer a usar build-tools 33.0.0
+        buildozer android debug 2>&1 | tail -100
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
