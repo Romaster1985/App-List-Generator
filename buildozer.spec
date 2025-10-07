@@ -8,7 +8,7 @@ requirements = python3, kivy, pyjnius
 orientation = portrait
 fullscreen = 0
 
-# CONFIGURACIÓN ANDROID ACTUALIZADA
+# CONFIGURACIÓN ANDROID - USA API 33
 android.api = 33
 android.minapi = 21
 android.permissions = READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE
