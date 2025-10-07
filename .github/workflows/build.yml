@@ -7,58 +7,36 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04  # Usamos Ubuntu 22.04 que es más estable
+    runs-on: ubuntu-22.04
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    
-    - name: Install system dependencies
+    - name: Build with Buildozer in isolated environment
       run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          python3-pip \
-          build-essential \
-          openjdk-11-jdk \
-          unzip \
-          zlib1g-dev \
-          libffi-dev \
-          libssl-dev \
-          autoconf \
-          automake \
-          libtool \
-          pkg-config \
-          cmake \
-          git \
-          ccache \
-          gettext \
-          curl \
-          wget \
-          zip \
-          unzip
-          
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install buildozer cython virtualenv wheel
+        # Create a simple Dockerfile and build
+        cat > Dockerfile << EOF
+        FROM ubuntu:22.04
         
-    - name: Setup Android SDK and accept licenses
-      run: |
-        yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses || true
-        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.0" "platforms;android-33"
+        RUN apt-get update && apt-get install -y \
+            python3-pip \
+            build-essential \
+            openjdk-11-jdk \
+            git \
+            zip \
+            unzip \
+            zlib1g-dev
+            
+        RUN pip3 install buildozer cython
         
-    - name: Build APK
-      run: |
-        export PATH=$PATH:~/.local/bin
-        # Initialize buildozer if needed
-        buildozer init || true
-        # Clean and build
-        buildozer android clean
-        buildozer -v android debug
+        WORKDIR /app
+        COPY . .
+        
+        RUN buildozer android debug
+        EOF
+        
+        docker build -t app-builder .
+        docker run --rm -v $(pwd)/bin:/app/bin app-builder
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
