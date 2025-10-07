@@ -36,12 +36,17 @@ jobs:
     - name: Install Buildozer
       run: pip3 install --user buildozer
       
-    - name: Build APK
+    - name: Accept Android SDK licenses
+      run: |
+        yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
+        
+    - name: Build APK with detailed logging
       run: |
         export PATH=$PATH:~/.local/bin
-        buildozer android debug
+        buildozer -v android debug 2>&1 | tail -200
         
     - name: Upload APK
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: AppListGenerator-APK
