@@ -7,18 +7,58 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # Usamos Ubuntu 22.04 que es más estable
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Build using Docker
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install system dependencies
       run: |
-        docker run --rm \
-        -v $(pwd):/home/user/hostcwd \
-        -v buildozer_deps:/home/user/.buildozer \
-        -v android_sdk:/home/user/.android \
-        cirocosta/buildozer buildozer android debug
+        sudo apt-get update
+        sudo apt-get install -y \
+          python3-pip \
+          build-essential \
+          openjdk-11-jdk \
+          unzip \
+          zlib1g-dev \
+          libffi-dev \
+          libssl-dev \
+          autoconf \
+          automake \
+          libtool \
+          pkg-config \
+          cmake \
+          git \
+          ccache \
+          gettext \
+          curl \
+          wget \
+          zip \
+          unzip
+          
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install buildozer cython virtualenv wheel
+        
+    - name: Setup Android SDK and accept licenses
+      run: |
+        yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses || true
+        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.0" "platforms;android-33"
+        
+    - name: Build APK
+      run: |
+        export PATH=$PATH:~/.local/bin
+        # Initialize buildozer if needed
+        buildozer init || true
+        # Clean and build
+        buildozer android clean
+        buildozer -v android debug
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
