@@ -20,52 +20,10 @@ jobs:
     - name: Install buildozer
       run: pip install buildozer cython
         
-    - name: Nuclear Android SDK setup
+    - name: Install Android tools with specific version
       run: |
-        # Crear TODAS las licencias manualmente
-        mkdir -p $ANDROID_SDK_ROOT/licenses
-        echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_SDK_ROOT/licenses/android-sdk-license
-        echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> $ANDROID_SDK_ROOT/licenses/android-sdk-license
-        echo "84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_SDK_ROOT/licenses/android-sdk-preview-license
-        echo "601085b94cd77f0b54ff86406957099ebe79c4d6" > $ANDROID_SDK_ROOT/licenses/android-googletv-license
-        echo "33b6a2b64607f11b759f320ef9dff4ae5c47d97a" > $ANDROID_SDK_ROOT/licenses/google-gdk-license
-        
-        # Aceptar licencias de manera interactiva usando Python
-        python3 -c "
-import subprocess
-import sys
-import time
-
-def accept_licenses():
-    process = subprocess.Popen(
-        ['$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager', '--licenses'],
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
-    
-    # Enviar 'y' para cada pregunta de licencia
-    for _ in range(20):  # Máximo 20 licencias
-        time.sleep(0.5)
-        try:
-            output = process.stdout.readline()
-            print(output)
-            if 'Accept? (y/N):' in output:
-                process.stdin.write('y\n')
-                process.stdin.flush()
-            elif not output:
-                break
-        except:
-            break
-    
-    process.communicate()
-
-accept_licenses()
-"
-
-        # Instalar build-tools 36.1.0 específicamente
-        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;36.1.0" "platforms;android-33" "platform-tools"
+        # Método directo: instalar una versión OLDER de build-tools que no pida licencia
+        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;30.0.3" "platforms;android-33" "platform-tools"
         
     - name: Build APK
       run: |
