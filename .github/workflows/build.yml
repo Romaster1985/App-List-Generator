@@ -15,44 +15,40 @@ jobs:
     - name: Setup environment
       run: |
         sudo apt-get update
-        sudo apt-get install -y python3-pip openjdk-11-jdk git zip unzip
+        sudo apt-get install -y python3-pip openjdk-11-jdk git zip unzip expect
         
     - name: Install buildozer
       run: pip install buildozer cython
         
     - name: Force accept ALL Android licenses
       run: |
-        # Método 100% efectivo para aceptar licencias
+        # Crear directorio de licencias
         mkdir -p $ANDROID_SDK_ROOT/licenses
         
-        # Crear TODAS las licencias manualmente con los hashes correctos
+        # Crear manualmente el archivo de licencia android-sdk-license
         echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_SDK_ROOT/licenses/android-sdk-license
-        echo "84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_SDK_ROOT/licenses/android-sdk-preview-license
         echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> $ANDROID_SDK_ROOT/licenses/android-sdk-license
-        echo "601085b94cd77f0b54ff86406957099ebe79c4d6" > $ANDROID_SDK_ROOT/licenses/android-googletv-license
-        echo "33b6a2b64607f11b759f320ef9dff4ae5c47d97a" > $ANDROID_SDK_ROOT/licenses/google-gdk-license
         
-        # Método adicional: usar expect para simular la tecla 'y'
+        # Otras licencias importantes
+        echo "84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_SDK_ROOT/licenses/android-sdk-preview-license
+        
+        # Usar expect para aceptar interactivamente las licencias restantes
         expect -c "
-set timeout 10
+set timeout 30
 spawn $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
 expect {
-  \"Accept? (y/N):\" { send \"y\r\"; exp_continue }
+  \"Accept? (y/N):\" { 
+    send \"y\r\"
+    exp_continue 
+  }
   eof
 }
 "
         
     - name: Install Android build tools
       run: |
-        # Instalar build-tools específicos forzando 'y' para cada pregunta
-        expect -c "
-set timeout 30
-spawn $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \"build-tools;33.0.0\" \"platforms;android-33\" \"platform-tools\"
-expect {
-  \"Accept? (y/N):\" { send \"y\r\"; exp_continue }
-  eof
-}
-"
+        # Instalar build-tools 33.0.0 específicamente
+        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.0" "platforms;android-33" "platform-tools"
         
     - name: Build APK
       run: |
@@ -62,4 +58,6 @@ expect {
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: AppListGenerator
+        name: AppListGenerator-APK
+        path: bin/*.apk
+        retention-days: 30
