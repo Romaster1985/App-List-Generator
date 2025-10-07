@@ -17,7 +17,7 @@ jobs:
       with:
         python-version: '3.9'
     
-    - name: Install system dependencies
+    - name: Install Buildozer and dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y \
@@ -25,28 +25,17 @@ jobs:
           autoconf \
           automake \
           build-essential \
-          ccache \
-          libffi-dev \
-          libltdl-dev \
-          libssl-dev \
           openjdk-11-jdk \
           unzip \
           zlib1g-dev
+        pip3 install --user buildozer
         
-    - name: Install Buildozer
-      run: pip3 install --user buildozer
-      
-    - name: Accept Android SDK licenses
-      run: |
-        yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
-        
-    - name: Build APK with detailed logging
+    - name: Build APK
       run: |
         export PATH=$PATH:~/.local/bin
-        buildozer -v android debug 2>&1 | tail -200
+        buildozer android debug
         
     - name: Upload APK
-      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: AppListGenerator-APK
