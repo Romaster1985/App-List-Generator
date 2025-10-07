@@ -7,9 +7,13 @@ version = 1.0
 requirements = python3, kivy, pyjnius
 orientation = portrait
 fullscreen = 0
+
+# CONFIGURACIÓN ANDROID ACTUALIZADA
 android.api = 33
 android.minapi = 21
 android.permissions = READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE
+
+# ASSETS
 presplash.filename = %(source.dir)s/assets/presplash.png
 icon.filename = %(source.dir)s/assets/icon.png
 
