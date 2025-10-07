@@ -8,10 +8,8 @@ requirements = python3, kivy, pyjnius
 orientation = portrait
 fullscreen = 0
 
-# CONFIGURACIÓN ESPECÍFICA
 android.api = 33
 android.minapi = 21
-# NO usar android.sdk - está deprecated
 android.ndk = 25b
 android.build_tools = 33.0.0
 
