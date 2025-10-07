@@ -15,32 +15,42 @@ jobs:
     - name: Setup environment
       run: |
         sudo apt-get update
-        sudo apt-get install -y python3-pip openjdk-11-jdk git zip unzip
+        sudo apt-get install -y python3-pip openjdk-11-jdk git zip unzip wget
         
     - name: Install buildozer
       run: pip install buildozer cython
         
-    - name: Install Android SDK tools manually
+    - name: Setup Buildozer SDK with correct structure
       run: |
-        # Aceptar licencias
-        mkdir -p $ANDROID_SDK_ROOT/licenses
-        echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_SDK_ROOT/licenses/android-sdk-license
-        echo "84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_SDK_ROOT/licenses/android-sdk-preview-license
-        
-        # Instalar herramientas específicas
-        yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
-        
-    - name: Create Buildozer directory structure
-      run: |
-        # Crear la estructura de directorios que Buildozer espera
+        # Crear directorio de Buildozer
         mkdir -p /home/runner/.buildozer/android/platform/android-sdk
-        # Copiar el SDK instalado a la ubicación de Buildozer
-        cp -r $ANDROID_SDK_ROOT/* /home/runner/.buildozer/android/platform/android-sdk/
+        
+        # Descargar command line tools
+        cd /home/runner/.buildozer/android/platform/android-sdk
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
+        unzip -q commandlinetools-linux-8512546_latest.zip
+        rm commandlinetools-linux-8512546_latest.zip
+        
+        # Crear la estructura de directorios que Buildozer espera
+        mkdir -p cmdline-tools
+        mv tools cmdline-tools/latest
+        
+        # Aceptar licencias
+        mkdir -p licenses
+        echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > licenses/android-sdk-license
+        echo "84831b9409646a918e30573bab4c9c91346d8abd" > licenses/android-sdk-preview-license
+        
+        # Instalar platform-tools, platforms y build-tools
+        yes | ./cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+        
+        # Crear enlace simbólico para la ubicación antigua que Buildozer busca
+        mkdir -p tools
+        ln -s ../cmdline-tools/latest/bin/sdkmanager tools/bin/sdkmanager
         
     - name: Build APK
       run: |
         export PATH=$PATH:~/.local/bin
-        buildozer -v android debug
+        buildozer android debug
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
