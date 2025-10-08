@@ -15,19 +15,24 @@ Una aplicación Android que escanea todas las aplicaciones instaladas en el disp
 - **Interfaz Material Design** con carteles identificadores
 - **Build automático** con GitHub Actions
 
-## 📦 Build Rápida Automática
-
-### Método Recomendado: GitHub Actions
+## 📦 Descarga Rápida Recomendada
+📥 [Descargar APK](https://github.com/Romaster1985/App-List-Generator/releases) - Releases
+### Método desde GitHub Actions:
 1. Ve a la pestaña [**Actions**](https://github.com/Romaster1985/App-List-Generator/actions)
 2. Selecciona el último workflow exitoso
 3. Descarga el artifact **app-scanner-apk**
 4. Instala el APK en tu dispositivo Android
 
 ### Build Local
+
 bash
+
 git clone https://github.com/Romaster1985/App-List-Generator.git
+
 cd App-List-Generator
+
 chmod +x gradlew
+
 ./gradlew assembleDebug
 
 ## 🛠️ Tecnologías Utilizadas
@@ -39,28 +44,6 @@ chmod +x gradlew
 - **CI/CD**: GitHub Actions
 - **Target API**: 34 (Android 14)
 - **Min API**: 21 (Android 5.0)
-
-## 📁 Estructura del Proyecto
-
-App-List-Generator/
-├── .github/workflows/
-│   └── build-apk.yml
-├── app/
-│   ├── src/main/java/com/appscanner/
-│   │   ├── MainActivity.java
-│   │   ├── AppInfo.java
-│   │   └── AppAdapter.java
-│   ├── src/main/res/
-│   └── build.gradle.kts
-├── gradle/wrapper/
-│   └── gradle-wrapper.properties
-├── build.gradle.kts
-├── settings.gradle.kts
-├── gradle.properties
-├── gradlew
-├── gradlew.bat
-├── README.md
-└── User_Manual.md
 
 ## 👨‍💻 Autor
 
