@@ -5,4 +5,5 @@
     <string name="apps_found">%d aplicaciones encontradas</string>
     <string name="show_all_apps">Mostrar Todas</string>
     <string name="show_user_apps">Solo Usuario</string>
+    <string name="show_system_apps">Solo Sistema</string>
 </resources>
