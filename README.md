@@ -24,12 +24,11 @@ Una aplicación Android que escanea todas las aplicaciones instaladas en el disp
 4. Instala el APK en tu dispositivo Android
 
 ### Build Local
-\`\`\`bash
+bash
 git clone https://github.com/Romaster1985/App-List-Generator.git
 cd App-List-Generator
 chmod +x gradlew
 ./gradlew assembleDebug
-\`\`\`
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -43,7 +42,6 @@ chmod +x gradlew
 
 ## 📁 Estructura del Proyecto
 
-\`\`\`
 App-List-Generator/
 ├── .github/workflows/
 │   └── build-apk.yml          # GitHub Actions workflow
@@ -63,7 +61,6 @@ App-List-Generator/
 ├── gradlew.bat                # Script de Gradle para Windows
 ├── README.md                  # Este archivo
 └── User_Manual.md             # Manual de usuario
-\`\`\`
 
 ## 👨‍💻 Autor
 

@@ -50,15 +50,10 @@ La aplicación muestra información actualizada en texto rojo:
 
 ### Formatos de Exportación:
 
-\`\`\`
-
 WhatsApp = com.whatsapp
 Chrome = com.android.chrome
 YouTube = com.google.android.youtube
 Gmail = com.google.android.gm
-
-...
-\`\`\`
 
 ### Características de Exportación:
 
