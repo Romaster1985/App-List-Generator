@@ -1,0 +1,9 @@
+<!-- app/src/main/res/values-es/strings.xml -->
+<resources>
+    <string name="app_name">App Scanner</string>
+    <string name="scanning">Escaneando aplicaciones…</string>
+    <string name="export_error">Error al exportar</string>
+    <string name="apps_found">%d aplicaciones encontradas</string>
+    <string name="show_all_apps">Mostrar Todas</string>
+    <string name="show_user_apps">Solo Usuario</string>
+</resources>
