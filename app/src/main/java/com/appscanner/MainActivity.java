@@ -69,36 +69,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void scanApps() {
-        scanButton.setEnabled(false);
-        statsText.setText(getString(R.string.scanning));
+    scanButton.setEnabled(false);
+    statsText.setText(getString(R.string.scanning));
 
-        new Thread(() -> {
-            PackageManager pm = getPackageManager();
-            List<PackageInfo> packages;
+    new Thread(() -> {
+        PackageManager pm = getPackageManager();
+        List<PackageInfo> packages;
+        
+        // MEJORAR: Usar flags más específicos
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            packages = pm.getInstalledPackages(PackageManager.MATCH_ALL);
+        } else {
+            packages = pm.getInstalledPackages(PackageManager.GET_META_DATA);
+        }
+
+        allApps.clear();
+        for (PackageInfo packageInfo : packages) {
+            String appName = packageInfo.applicationInfo.loadLabel(pm).toString();
+            String packageName = packageInfo.packageName;
             
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                packages = pm.getInstalledPackages(PackageManager.MATCH_ALL);
-            } else {
-                packages = pm.getInstalledPackages(0);
-            }
+            // MEJORAR: Detección más precisa de apps de sistema
+            boolean isSystemApp = (packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0 
+                               || (packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
+            
+            allApps.add(new AppInfo(appName, packageName, isSystemApp));
+        }
 
-            allApps.clear();
-            for (PackageInfo packageInfo : packages) {
-                String appName = packageInfo.applicationInfo.loadLabel(pm).toString();
-                String packageName = packageInfo.packageName;
-                boolean isSystemApp = (packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
-                
-                allApps.add(new AppInfo(appName, packageName, isSystemApp));
-            }
-
-            runOnUiThread(() -> {
-                applyFilter();
-                scanButton.setEnabled(true);
-                exportButton.setEnabled(!allApps.isEmpty());
-                updateStats();
-            });
-        }).start();
-    }
+        runOnUiThread(() -> {
+            applyFilter();
+            scanButton.setEnabled(true);
+            exportButton.setEnabled(!allApps.isEmpty());
+            updateStats();
+        });
+    }).start();
+}
 
     private void toggleFilter() {
         showSystemApps = !showSystemApps;
