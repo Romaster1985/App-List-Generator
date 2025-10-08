@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView statsText;
     
     private List<AppInfo> allApps = new ArrayList<>();
-    private int filterState = 0; // 0: Solo usuario, 1: Solo sistema, 2: Todas
+    private int filterState = 0; // 0: Solo usuario, 1: Solo sistema, 2: Solo Google Apps, 3: Todas
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,11 +121,6 @@ public class MainActivity extends AppCompatActivity {
                                      packageName.startsWith("com.google.android.tts") || // Text-to-Speech
                                      packageName.startsWith("com.google.android.googlequicksearchbox"); // Google App
                 
-                // Si es Google App, no se considera app de sistema para los filtros
-                if (isGoogleApp) {
-                    isSystemApp = false;
-                }
-                
                 allApps.add(new AppInfo(appName, packageName, isSystemApp, isGoogleApp));
             }
 
@@ -139,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void toggleFilter() {
-        filterState = (filterState + 1) % 3; // Ciclar entre 0, 1, 2
+        filterState = (filterState + 1) % 4; // Ciclar entre 0, 1, 2, 3
         updateFilterButtonText();
         applyFilter();
     }
@@ -153,6 +148,9 @@ public class MainActivity extends AppCompatActivity {
                 filterButton.setText("SOLO SISTEMA");
                 break;
             case 2:
+                filterButton.setText("SOLO GAPPS");
+                break;
+            case 3:
                 filterButton.setText("MOSTRAR TODAS");
                 break;
         }
@@ -162,17 +160,22 @@ public class MainActivity extends AppCompatActivity {
         List<AppInfo> filteredApps = new ArrayList<>();
         for (AppInfo app : allApps) {
             switch (filterState) {
-                case 0: // Solo usuario
-                    if (!app.isSystemApp()) {
+                case 0: // Solo usuario (no sistema, no Google Apps)
+                    if (!app.isSystemApp() && !app.isGoogleApp()) {
                         filteredApps.add(app);
                     }
                     break;
                 case 1: // Solo sistema
-                    if (app.isSystemApp()) {
+                    if (app.isSystemApp() && !app.isGoogleApp()) {
                         filteredApps.add(app);
                     }
                     break;
-                case 2: // Mostrar todas
+                case 2: // Solo Google Apps
+                    if (app.isGoogleApp()) {
+                        filteredApps.add(app);
+                    }
+                    break;
+                case 3: // Mostrar todas
                     filteredApps.add(app);
                     break;
             }
@@ -185,33 +188,67 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Acerca de App Scanner");
         
-        // Crear texto con enlace clickeable
+        // Crear texto con enlaces clickeables
         String messageText = "Autor: Romaster1985\n\n" +
                 "e-mail: roman.ignacio.romero@gmail.com\n\n" +
                 "GitHub: https://github.com/Romaster1985/App-List-Generator.git\n\n" +
                 "Agradecimientos:\n" +
                 "• Deepseek\n" +
                 "• ChatGPT\n" +
-                "• Replit";
+                "• Replit\n" +
+                "• Gradle: https://github.com/gradle/gradle";
         
         SpannableString spannableMessage = new SpannableString(messageText);
         
         // Hacer el enlace de GitHub clickeable
-        String url = "https://github.com/Romaster1985/App-List-Generator.git";
-        int start = messageText.indexOf(url);
-        int end = start + url.length();
+        String githubUrl = "https://github.com/Romaster1985/App-List-Generator.git";
+        int githubStart = messageText.indexOf(githubUrl);
+        int githubEnd = githubStart + githubUrl.length();
         
-        if (start >= 0) {
-            ClickableSpan clickableSpan = new ClickableSpan() {
+        if (githubStart >= 0) {
+            ClickableSpan githubClickableSpan = new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {
-                    // Abrir el enlace en el navegador
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl));
                     startActivity(intent);
                 }
             };
-            
-            spannableMessage.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableMessage.setSpan(githubClickableSpan, githubStart, githubEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        
+        // Hacer el enlace de Gradle clickeable
+        String gradleUrl = "https://github.com/gradle/gradle";
+        int gradleStart = messageText.indexOf(gradleUrl);
+        int gradleEnd = gradleStart + gradleUrl.length();
+        
+        if (gradleStart >= 0) {
+            ClickableSpan gradleClickableSpan = new ClickableSpan() {
+                @Override
+                public void onClick(View widget) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(gradleUrl));
+                    startActivity(intent);
+                }
+            };
+            spannableMessage.setSpan(gradleClickableSpan, gradleStart, gradleEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        
+        // Hacer el correo electrónico clickeable
+        String email = "roman.ignacio.romero@gmail.com";
+        int emailStart = messageText.indexOf(email);
+        int emailEnd = emailStart + email.length();
+        
+        if (emailStart >= 0) {
+            ClickableSpan emailClickableSpan = new ClickableSpan() {
+                @Override
+                public void onClick(View widget) {
+                    Intent intent = new Intent(Intent.ACTION_SENDTO);
+                    intent.setData(Uri.parse("mailto:" + email));
+                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Consulta sobre App Scanner");
+                    startActivity(Intent.createChooser(intent, "Enviar correo..."));
+                }
+            };
+            spannableMessage.setSpan(emailClickableSpan, emailStart, emailEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         
         builder.setMessage(spannableMessage);
@@ -242,11 +279,10 @@ public class MainActivity extends AppCompatActivity {
         int googleApps = 0;
         
         for (AppInfo app : allApps) {
-            if (app.isSystemApp()) {
+            if (app.isSystemApp() && !app.isGoogleApp()) {
                 systemApps++;
             } else if (app.isGoogleApp()) {
                 googleApps++;
-                userApps++; // Las Google Apps cuentan como usuario
             } else {
                 userApps++;
             }
@@ -270,7 +306,15 @@ public class MainActivity extends AppCompatActivity {
                     "• Google: %d",
                     adapter.getItemCount(), totalApps, userApps, googleApps);
                 break;
-            case 2: // Mostrar todas
+            case 2: // Solo Google Apps
+                statsTextContent = String.format(Locale.getDefault(),
+                    "GOOGLE APPS: %d\n" +
+                    "Total instaladas: %d\n" +
+                    "• Usuario: %d\n" +
+                    "• Sistema: %d",
+                    adapter.getItemCount(), totalApps, userApps, systemApps);
+                break;
+            case 3: // Mostrar todas
                 statsTextContent = String.format(Locale.getDefault(),
                     "TODAS LAS APPS: %d\n" +
                     "• Usuario: %d\n" +
