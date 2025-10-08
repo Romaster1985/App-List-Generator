@@ -8,6 +8,12 @@ on:
   release:
     types: [ published ]
 
+# 🔐 PERMISOS AGREGADOS - Esto soluciona el error
+permissions:
+  contents: write
+  actions: read
+  checks: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -46,5 +52,5 @@ jobs:
       with:
         upload_url: ${{ github.event.release.upload_url }}
         asset_path: app/build/outputs/apk/debug/app-debug.apk
-        asset_name: AppScanner-v${{ github.event.release.tag_name }}.apk
+        asset_name: App_Scanner_1.0b.apk  # 🔥 Cambié el nombre para que coincida con tu release
         asset_content_type: application/vnd.android.package-archive
