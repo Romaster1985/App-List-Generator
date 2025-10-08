@@ -51,8 +51,11 @@ La aplicación muestra información actualizada en texto rojo:
 ### Formatos de Exportación:
 
 WhatsApp = com.whatsapp
+
 Chrome = com.android.chrome
+
 YouTube = com.google.android.youtube
+
 Gmail = com.google.android.gm
 
 ### Características de Exportación:
@@ -87,7 +90,8 @@ La aplicación utiliza carteles de colores para identificar tipos de apps:
 **¿Dónde se guardan los archivos exportados?**
 
 - En la carpeta Downloads de tu dispositivo
-- Nombres con formato: `installed_apps_AAAAMMDD_HHMMSS.txt`
+- Nombres con formato:
+`installed_apps_AAAAMMDD_HHMMSS.txt`
 
 **¿Puedo exportar listas específicas?**
 
