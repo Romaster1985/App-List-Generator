@@ -2,6 +2,7 @@ package com.appscanner;
 
 import android.Manifest;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -11,6 +12,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -93,10 +99,34 @@ public class MainActivity extends AppCompatActivity {
             for (PackageInfo packageInfo : packages) {
                 String appName = packageInfo.applicationInfo.loadLabel(pm).toString();
                 String packageName = packageInfo.packageName;
+                
+                // Detectar si es app de sistema
                 boolean isSystemApp = (packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0 
                                    || (packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
                 
-                allApps.add(new AppInfo(appName, packageName, isSystemApp));
+                // Detectar si es Google App
+                boolean isGoogleApp = packageName.startsWith("com.google.") || 
+                                     packageName.contains("google") ||
+                                     appName.toLowerCase().contains("google") ||
+                                     packageName.startsWith("com.android.vending") || // Play Store
+                                     packageName.startsWith("com.android.chrome") || // Chrome
+                                     packageName.startsWith("com.google.android.gm") || // Gmail
+                                     packageName.startsWith("com.google.android.youtube") || // YouTube
+                                     packageName.startsWith("com.google.android.apps.maps") || // Maps
+                                     packageName.startsWith("com.google.android.apps.photos") || // Photos
+                                     packageName.startsWith("com.google.android.apps.drive") || // Drive
+                                     packageName.startsWith("com.google.android.calendar") || // Calendar
+                                     packageName.startsWith("com.google.android.contacts") || // Contacts
+                                     packageName.startsWith("com.google.android.apps.tachyon") || // Duo/Meet
+                                     packageName.startsWith("com.google.android.tts") || // Text-to-Speech
+                                     packageName.startsWith("com.google.android.googlequicksearchbox"); // Google App
+                
+                // Si es Google App, no se considera app de sistema para los filtros
+                if (isGoogleApp) {
+                    isSystemApp = false;
+                }
+                
+                allApps.add(new AppInfo(appName, packageName, isSystemApp, isGoogleApp));
             }
 
             runOnUiThread(() -> {
@@ -154,20 +184,49 @@ public class MainActivity extends AppCompatActivity {
     private void showAboutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Acerca de App Scanner");
-        builder.setMessage(
-            "Autor: Romaster1985\n\n" +
-            "e-mail: roman.ignacio.romero@gmail.com\n\n" +
-            "GitHub: https://github.com/Romaster1985/App-List-Generator.git\n\n" +
-            "Agradecimientos:\n" +
-            "• Deepseek\n" +
-            "• ChatGPT\n" +
-            "• Replit Bots"
-        );
+        
+        // Crear texto con enlace clickeable
+        String messageText = "Autor: Romaster1985\n\n" +
+                "e-mail: roman.ignacio.romero@gmail.com\n\n" +
+                "GitHub: https://github.com/Romaster1985/App-List-Generator.git\n\n" +
+                "Agradecimientos:\n" +
+                "• Deepseek\n" +
+                "• ChatGPT\n" +
+                "• Replit";
+        
+        SpannableString spannableMessage = new SpannableString(messageText);
+        
+        // Hacer el enlace de GitHub clickeable
+        String url = "https://github.com/Romaster1985/App-List-Generator.git";
+        int start = messageText.indexOf(url);
+        int end = start + url.length();
+        
+        if (start >= 0) {
+            ClickableSpan clickableSpan = new ClickableSpan() {
+                @Override
+                public void onClick(View widget) {
+                    // Abrir el enlace en el navegador
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(intent);
+                }
+            };
+            
+            spannableMessage.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        
+        builder.setMessage(spannableMessage);
         builder.setPositiveButton("CERRAR", (dialog, which) -> dialog.dismiss());
         builder.setCancelable(true);
         
         AlertDialog dialog = builder.create();
         dialog.show();
+        
+        // Hacer que el texto sea clickeable
+        TextView messageTextView = dialog.findViewById(android.R.id.message);
+        if (messageTextView != null) {
+            messageTextView.setMovementMethod(LinkMovementMethod.getInstance());
+            messageTextView.setLinkTextColor(Color.BLUE);
+        }
     }
 
     private void updateStats() {
@@ -180,10 +239,14 @@ public class MainActivity extends AppCompatActivity {
         int totalApps = allApps.size();
         int userApps = 0;
         int systemApps = 0;
+        int googleApps = 0;
         
         for (AppInfo app : allApps) {
             if (app.isSystemApp()) {
                 systemApps++;
+            } else if (app.isGoogleApp()) {
+                googleApps++;
+                userApps++; // Las Google Apps cuentan como usuario
             } else {
                 userApps++;
             }
@@ -195,22 +258,25 @@ public class MainActivity extends AppCompatActivity {
                 statsTextContent = String.format(Locale.getDefault(),
                     "APPS DE USUARIO: %d\n" +
                     "Total instaladas: %d\n" +
-                    "Apps de sistema: %d",
-                    adapter.getItemCount(), totalApps, systemApps);
+                    "• Sistema: %d\n" +
+                    "• Google: %d",
+                    adapter.getItemCount(), totalApps, systemApps, googleApps);
                 break;
             case 1: // Solo sistema
                 statsTextContent = String.format(Locale.getDefault(),
                     "APPS DE SISTEMA: %d\n" +
                     "Total instaladas: %d\n" +
-                    "Apps de usuario: %d",
-                    adapter.getItemCount(), totalApps, userApps);
+                    "• Usuario: %d\n" +
+                    "• Google: %d",
+                    adapter.getItemCount(), totalApps, userApps, googleApps);
                 break;
             case 2: // Mostrar todas
                 statsTextContent = String.format(Locale.getDefault(),
                     "TODAS LAS APPS: %d\n" +
                     "• Usuario: %d\n" +
-                    "• Sistema: %d",
-                    adapter.getItemCount(), userApps, systemApps);
+                    "• Sistema: %d\n" +
+                    "• Google: %d",
+                    adapter.getItemCount(), userApps, systemApps, googleApps);
                 break;
             default:
                 statsTextContent = "Error en filtro";

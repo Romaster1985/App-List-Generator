@@ -22,15 +22,29 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <!-- Cartel para apps de sistema -->
         <TextView
             android:id="@+id/systemAppText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Sistema"
-            android:textSize="12sp"
+            android:textSize="10sp"
             android:background="#ff4444"
             android:textColor="#ffffff"
-            android:padding="4dp"
+            android:padding="2dp"
+            android:layout_marginEnd="4dp"
+            android:visibility="gone" />
+
+        <!-- Cartel para Google Apps -->
+        <TextView
+            android:id="@+id/googleAppText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gapps"
+            android:textSize="10sp"
+            android:background="#ff8800"
+            android:textColor="#ffffff"
+            android:padding="2dp"
             android:visibility="gone" />
 
     </LinearLayout>

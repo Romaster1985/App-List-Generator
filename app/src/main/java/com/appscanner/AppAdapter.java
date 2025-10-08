@@ -51,23 +51,32 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.AppViewHolder> {
         private TextView appNameText;
         private TextView packageNameText;
         private TextView systemAppText;
+        private TextView googleAppText;
 
         public AppViewHolder(@NonNull View itemView) {
             super(itemView);
             appNameText = itemView.findViewById(R.id.appNameText);
             packageNameText = itemView.findViewById(R.id.packageNameText);
             systemAppText = itemView.findViewById(R.id.systemAppText);
+            googleAppText = itemView.findViewById(R.id.googleAppText);
         }
 
         public void bind(AppInfo app) {
             appNameText.setText(app.getAppName());
             packageNameText.setText(app.getPackageName());
             
+            // Mostrar cartel "Sistema" para apps de sistema
             if (app.isSystemApp()) {
-                systemAppText.setText("Sistema");
                 systemAppText.setVisibility(View.VISIBLE);
             } else {
                 systemAppText.setVisibility(View.GONE);
+            }
+            
+            // Mostrar cartel "Gapps" para Google Apps
+            if (app.isGoogleApp()) {
+                googleAppText.setVisibility(View.VISIBLE);
+            } else {
+                googleAppText.setVisibility(View.GONE);
             }
         }
     }
