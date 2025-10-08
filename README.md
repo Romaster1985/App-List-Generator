@@ -15,7 +15,7 @@ Una aplicación Android que escanea todas las aplicaciones instaladas en el disp
 - **Interfaz Material Design** con carteles identificadores
 - **Build automático** con GitHub Actions
 
-## 📦 Descarga Rápida
+## 📦 Build Rápida Automática
 
 ### Método Recomendado: GitHub Actions
 1. Ve a la pestaña [**Actions**](https://github.com/Romaster1985/App-List-Generator/actions)
@@ -44,23 +44,23 @@ chmod +x gradlew
 
 App-List-Generator/
 ├── .github/workflows/
-│   └── build-apk.yml          # GitHub Actions workflow
+│   └── build-apk.yml
 ├── app/
 │   ├── src/main/java/com/appscanner/
-│   │   ├── MainActivity.java  # Actividad principal
-│   │   ├── AppInfo.java       # Modelo de datos
-│   │   └── AppAdapter.java    # Adapter para RecyclerView
-│   ├── src/main/res/          # Recursos y layouts
-│   └── build.gradle.kts       # Configuración del módulo
+│   │   ├── MainActivity.java
+│   │   ├── AppInfo.java
+│   │   └── AppAdapter.java
+│   ├── src/main/res/
+│   └── build.gradle.kts
 ├── gradle/wrapper/
 │   └── gradle-wrapper.properties
-├── build.gradle.kts           # Configuración del proyecto
-├── settings.gradle.kts        # Configuración de settings
-├── gradle.properties          # Propiedades de Gradle
-├── gradlew                    # Script de Gradle para Unix
-├── gradlew.bat                # Script de Gradle para Windows
-├── README.md                  # Este archivo
-└── User_Manual.md             # Manual de usuario
+├── build.gradle.kts
+├── settings.gradle.kts
+├── gradle.properties
+├── gradlew
+├── gradlew.bat
+├── README.md
+└── User_Manual.md
 
 ## 👨‍💻 Autor
 
@@ -82,7 +82,7 @@ App-List-Generator/
 - 📖 [Manual de Usuario](User_Manual.md) - Instrucciones detalladas de uso
 - 🐛 [Reportar Issues](https://github.com/Romaster1985/App-List-Generator/issues) - ¿Encontraste un error?
 - 💡 [Sugerir Features](https://github.com/Romaster1985/App-List-Generator/issues) - Ideas para mejorar la app
-- 📥 [Descargar APK](https://github.com/Romaster1985/App-List-Generator/actions) - Builds automáticos
+- 📥 [Descargar APK](https://github.com/Romaster1985/App-List-Generator/releases) - Releases
 
 ---
 
